@@ -3,11 +3,26 @@
 <head>
     <meta charset="UTF-8">
     <title>RTK Lookup</title>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.5.0/css/font-awesome.min.css">
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='style.css') }}">
 </head>
 <body>
-    <form action="/heisig" method="post">
-        <input type="number" placeholder="Enter #" name="kanji_nr">
-        <button type="submit">To Jisho!</button>
+<div id="content">
+    <form id="search" action="/heisig" method="get">
+        <div id="searchbox">
+            <input type="text" placeholder="Heisig's Kanji #" name="kanji_nr">
+            <button id="search-btn" type="submit"><i class="fa fa-search"></i></button>
+        </div>
     </form>
+    {% with messages = get_flashed_messages() %}
+        {% if messages %}
+            <ul class=flashes>
+                {% for message in messages %}
+                    <li>{{ message }}</li>
+                {% endfor %}
+            </ul>
+        {% endif %}
+    {% endwith %}
+</div>
 </body>
 </html>

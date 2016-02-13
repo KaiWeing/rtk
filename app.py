@@ -1,6 +1,6 @@
 import sqlite3
 import os
-from flask import Flask, redirect, g, request, render_template
+from flask import Flask, redirect, g, request, render_template, abort, flash, url_for
 
 SECRET_KEY = 'development key'
 DEBUG = False
@@ -33,11 +33,17 @@ def index():
 	return render_template('index.html')
 
 
-@app.route('/heisig', methods=['POST'])
+@app.route('/heisig')
 def lookup():
-	cur = g.db.execute('select kanji from rtk where nr_4 = ?', [request.form['kanji_nr']])
-	kanji = str(cur.fetchone()[0])
-	return redirect("http://jisho.org/search/" + kanji + " %23kanji")
+	kanji_nr = request.args['kanji_nr']
+	cur = g.db.execute('select kanji from rtk where nr_4 = ?', [kanji_nr])
+	found = cur.fetchone()
+	if not found:
+		flash("No kanji nr " + kanji_nr)
+		return redirect(url_for('index'))
+	else:
+		kanji = str(found[0])
+		return redirect("http://jisho.org/search/" + kanji + " %23kanji")
 
 
 if __name__ == '__main__':
