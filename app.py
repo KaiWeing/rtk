@@ -3,7 +3,7 @@ import os
 from flask import Flask, redirect, g, request, render_template, abort, flash, url_for
 
 SECRET_KEY = 'development key'
-DEBUG = False
+DEBUG = True
 APP_ROOT = os.path.dirname(os.path.abspath(__file__))
 DATABASE_ROOT = os.path.join(APP_ROOT, 'data')
 DATABASE = os.path.join(DATABASE_ROOT, 'rtk.db')
@@ -35,15 +35,26 @@ def index():
 
 @app.route('/heisig')
 def lookup():
-	kanji_nr = request.args['kanji_nr']
-	cur = g.db.execute('select kanji from rtk where nr_4 = ?', [kanji_nr])
-	found = cur.fetchone()
-	if not found:
-		flash("No kanji nr " + kanji_nr)
+	search_input = request.args['kanji_search']
+	kanji = search(search_input)
+	if not kanji:
+		flash(search_input + " not found")
 		return redirect(url_for('index'))
 	else:
-		kanji = str(found[0])
 		return redirect("http://jisho.org/search/" + kanji + " %23kanji")
+
+
+def search(text):
+	try:
+		nr = int(text)
+		cur = g.db.execute('SELECT kanji FROM rtk WHERE nr_4 = ?', [nr])
+	except ValueError:
+		cur = g.db.execute('SELECT kanji FROM rtk WHERE name_deu = ? COLLATE nocase OR name_eng = ? COLLATE nocase', [text, text])
+	found = cur.fetchone()
+	if not found:
+		return None
+	else:
+		return found[0]
 
 
 if __name__ == '__main__':
