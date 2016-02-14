@@ -25,7 +25,12 @@ div#searchbox {
 }
 
 ul.flashes {
-    list-style-type: none;
+    list-style: none;
+    padding-left: 0;
+    font-size: 2em;
+    font-weight: bold;
+    color: rgba(214, 69, 53, 1);
+    text-transform: uppercase;
 }
 
 div#searchbox button {
